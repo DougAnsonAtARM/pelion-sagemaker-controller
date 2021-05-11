@@ -26,7 +26,7 @@ setup(
     author_email="Doug.Anson@pelion.com",
     license='Apache 2.0',
     classifiers=(
-        'Development Status :: 0 - Prototype',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 2',
