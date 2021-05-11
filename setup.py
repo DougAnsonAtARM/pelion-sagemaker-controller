@@ -3,7 +3,7 @@ import os
 from setuptools import find_packages
 from setuptools import setup
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -26,7 +26,7 @@ setup(
     author_email="Doug.Anson@pelion.com",
     license='Apache 2.0',
     classifiers=(
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 2',
