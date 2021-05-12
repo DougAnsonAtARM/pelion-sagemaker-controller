@@ -7,15 +7,17 @@ This python package simplifies the Data Scientist's job of accessing the Sagemak
 To invoke an instance of this API:
 	
 	# Required import
-	import seatpapi as pelion
+	import seatpapi.seatpapi as pelion
 	
 	#
 	# Invoke constructor with Pelion API Key, Pelion GW Device ID
 	# You can also optionally specify the Pelion API endpoint you want to use
 	#
-	api = pelion.PelionAPI(api_key='<ak_xxxx>', 
+	api = pelion.PelionAPI(
+			api_key='<ak_xxxx>', 
 			device_id='<pelion_gw_device_id>', 
-			api_endpoint='api.us-east-1.mbedcloud.com')
+			api_endpoint='api.us-east-1.mbedcloud.com'
+			)
 		
 		
 ### Supported Commands
