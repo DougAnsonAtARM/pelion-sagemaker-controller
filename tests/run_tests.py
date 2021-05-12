@@ -11,10 +11,10 @@ import argparse
 # Logging
 import logging
 
-NAME='seatpapi'
+NAME='pelion_sagemaker_controller'
 
-# Sagemaker Edge Agent To Pelion API (seatpapi)
-import seatpapi as pelion
+# Sagemaker Edge Agent Controller API for Pelion
+import pelion_sagemaker_controller
 
 # Create logger
 logger = logging.getLogger(NAME)
@@ -27,7 +27,7 @@ def exit_signal(signum, frame):
 # Run Tests
 def run_tests(api_key,device_id,endpoint_api):
     # Allocate
-    api = pelion.PelionAPI(api_key,device_id,endpoint_api)
+    api = pelion_sagemaker_controller.ControllerAPI(api_key,device_id,endpoint_api)
     
     # List Models
     json = api.pelion_list_models()
