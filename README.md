@@ -1,10 +1,12 @@
-## Sagemaker Edge Agent Controller API for Pelion Edge (pelion\_sagemaker\_controller)
+## Sagemaker Edge Agent Controller client API for Pelion Edge 
 
-This python package simplifies the Data Scientist's job of accessing the Sagemaker Edge Agent running on their Pelion Edge enabled gateway.
+#### PyPi:  [https://pypi.org/project/pelion\_sagemaker\_controller/](https://pypi.org/project/pelion\_sagemaker\_controller/)
 
-### Allocation
+This python package simplifies the Data Scientist's job of accessing, via a Sagemaker Jupyter Notebook, the Sagemaker Edge Agent running on their Pelion Edge enabled gateway.
 
-To invoke an instance of this API:
+### Controller API Instance Creation
+
+To create an instance of this API:
 	
 	# Required import
 	import pelion_sagemaker_controller
@@ -22,7 +24,7 @@ To invoke an instance of this API:
 		
 ### Supported Commands
 
-The following commands are supported in this packages
+The following commands are supported by this API:
 
 #### Get Configuration
 
@@ -61,7 +63,7 @@ The following commands are supported in this packages
 
 	api.pelion_reload_model('model-name','compiled-model-x.y.tar.gz')
 	
-	This call is a convenience method for simply performing a "unload" followed by
+	This call is a convenience method for simply performing an "unload" followed by
 	a "load" of a given model using the methods above. 
 	
 #### Predict
@@ -85,7 +87,7 @@ The following commands are supported in this packages
 
 	api.pelion_last_cmd_result()
 	
-	This call simply returns the last invocation result. In cases where predictions take
+	This call returns the last invocation/call results. In cases where predictions take
 	a long time to complete, this call may be used in a polling situation to determine
 	when the prediction operation has completed. 
 
