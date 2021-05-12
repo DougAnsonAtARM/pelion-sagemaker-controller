@@ -9,7 +9,7 @@ This python package simplifies the Data Scientist's job of accessing, via a Sage
 To create an instance of this API:
 	
 	# Required import
-	import pelion_sagemaker_controller
+	from pelion_sagemaker_controller import pelion_sagemaker_controller
 	
 	#
 	# Invoke constructor with Pelion API Key, Pelion GW Device ID
