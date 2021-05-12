@@ -2,7 +2,7 @@ import pathlib
 import os
 from setuptools import setup
 
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -16,11 +16,11 @@ with open(os.path.join(HERE, 'requirements.txt')) as fh:
 
 # This call to setup() does all the work
 setup(
-    name="seatpapi",
-    description="AWS Sagemaker Edge Agent To Pelion API",
+    name="pelion_sagemaker_controller",
+    description="AWS Sagemaker Controller notebook/client API for Pelion Edge Gateways",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/DougAnsonAtARM/seatpapi",
+    url="https://github.com/DougAnsonAtARM/pelion-sagemaker-controller",
     author="Doug Anson",
     author_email="Doug.Anson@pelion.com",
     license='Apache 2.0',
@@ -33,7 +33,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet',
     ),
-    packages=['seatpapi'],
+    packages=['pelion_sagemaker_controller'],
     install_requires=requirements,
     python_requires='>=2.7.10, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.0, !=3.4.1, !=3.4.2, <4',
     version=__version__,

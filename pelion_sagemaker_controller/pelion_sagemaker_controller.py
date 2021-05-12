@@ -1,4 +1,4 @@
-# seatpapi.py
+# pelion_sage_controller_api.py
 
 # Requirements
 import requests
@@ -8,9 +8,9 @@ import uuid
 import time
 
 #
-# AWS Sagemaker Edge Agent via Pelion notebook client API
+# AWS Sagemaker Edge Agent via Pelion controller API
 #
-class PelionAPI:
+class ControllerAPI:
     # Constructor
     def __init__(self, api_key, gw_device_id, api_endpoint = 'api.us-east-1.mbedcloud.com'):
         # To Do: Lets keep the API Key as protected as possible... 
@@ -78,6 +78,10 @@ class PelionAPI:
         req_id = str(uuid.uuid4())
         return self.__pelion_get(req_id,self.pelion_rpc_request_lwmwm_uri)
 
+    #
+    # Configuration API
+    #
+    
     # Get Configuration
     def pelion_get_config(self):
         req_id = str(uuid.uuid4())
@@ -91,6 +95,11 @@ class PelionAPI:
         self.__pelion_put(req_id,self.pelion_config_lwm2m_uri,config_update)
         return self.pelion_get_config()
 
+    #
+    # Sagemaker Controls
+    # These commands need to conform to the JsonRPC format presented in SageMakerEdgeAgentContainer/sagemaker-agent-pt.js
+    #
+    
     # ListModels
     def pelion_list_models(self):
         req_id = str(uuid.uuid4())
@@ -108,6 +117,11 @@ class PelionAPI:
         req_id = str(uuid.uuid4())
         self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri, {"jsonrpc":"2.0","id":req_id,"method":"unloadModel","params":{"name":model_name}})
         return self.pelion_last_cmd_result()
+    
+    # ReloadModel
+    def pelion_reload_model(self,model_name,s3_filename):
+        self.pelion_unload_model(model_name)
+        return self.pelion_load_model(model_name,s3_filename)
 
     # Predict
     def pelion_predict(self,model_name,input_data_url,output_url):

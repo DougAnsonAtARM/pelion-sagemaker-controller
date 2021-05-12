@@ -1,4 +1,4 @@
-## Sagemaker Edge Agent To Pelion API (seatpapi)
+## Sagemaker Edge Agent Controller API for Pelion Edge (pelion\_sagemaker\_controller)
 
 This python package simplifies the Data Scientist's job of accessing the Sagemaker Edge Agent running on their Pelion Edge enabled gateway.
 
@@ -7,13 +7,13 @@ This python package simplifies the Data Scientist's job of accessing the Sagemak
 To invoke an instance of this API:
 	
 	# Required import
-	import seatpapi.seatpapi as pelion
+	import pelion_sagemaker_controller
 	
 	#
 	# Invoke constructor with Pelion API Key, Pelion GW Device ID
 	# You can also optionally specify the Pelion API endpoint you want to use
 	#
-	api = pelion.PelionAPI(
+	api = pelion_sagemaker_controller.ControllerAPI(
 			api_key='<ak_xxxx>', 
 			device_id='<pelion_gw_device_id>', 
 			api_endpoint='api.us-east-1.mbedcloud.com'
@@ -57,9 +57,20 @@ The following commands are supported in this packages
 	
 	This call unloads the loaded model referenced by the name 'model-name'
 	
+#### Reload Model
+
+	api.pelion_reload_model('model-name','compiled-model-x.y.tar.gz')
+	
+	This call is a convenience method for simply performing a "unload" followed by
+	a "load" of a given model using the methods above. 
+	
 #### Predict
 
-	api.pelion_predict('model-name','s3:///input.data', 's3:///prediction_result.data')
+	api.pelion_predict(
+	          'model-name',
+	          's3:///input.data', 
+	          's3:///prediction_result.data'
+	          )
 	
 	This call invokes the model prediction using the specified input.data file that is
 	configured to be pulled from the Sagemaker S3 bucket (per configuration). The output
