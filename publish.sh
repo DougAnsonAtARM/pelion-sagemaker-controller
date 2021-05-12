@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm -rf build dist src/*info
+rm -rf build dist seatpapi/*info
 python3 setup.py sdist bdist_wheel
-# python3 -m twine upload --repository testpypi dist/*
-python3 -m twine upload --repository pypi dist/*
+python3 -m twine upload --repository testpypi dist/*
+# python3 -m twine upload --repository pypi dist/*

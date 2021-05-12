@@ -1,6 +1,5 @@
 import pathlib
 import os
-from setuptools import find_packages
 from setuptools import setup
 
 __version__ = '0.0.4'
@@ -34,8 +33,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet',
     ),
-    package_dir={'': 'src'},
-    packages=find_packages('src'),
+    packages=['seatpapi'],
     install_requires=requirements,
     python_requires='>=2.7.10, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.0, !=3.4.1, !=3.4.2, <4',
     version=__version__,
