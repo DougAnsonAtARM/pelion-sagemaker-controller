@@ -22,6 +22,7 @@ class ControllerAPI:
         # Pelion Edge Sagemaker Edge Agent Device surfaces out these two LWM2M resources
         self.pelion_rpc_request_lwmwm_uri = '/33311/0/5701'
         self.pelion_config_lwm2m_uri = '/33311/0/5702'
+        self.pelion_cmd_status_lwm2m_uri = '/33311/0/5702'
 
         # Standard Pelion Northbound API plumbing with our selected device ID from above...
         self.pelion_api_endpoint = api_endpoint
@@ -99,6 +100,24 @@ class ControllerAPI:
     # Sagemaker Controls
     # These commands need to conform to the JsonRPC format presented in SageMakerEdgeAgentContainer/sagemaker-agent-pt.js
     #
+    
+    # Is dispatched command running?
+    def pelion_cmd_is_running(self):
+        req_id = str(uuid.uuid4())
+        status = self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri)
+        if 'status' in status:
+            if status['status'] != 'idle':
+                return True
+        return False
+    
+    # Is dispatch command in error?
+    def pelion_cmd_in_error(self):
+        req_id = str(uuid.uuid4())
+        status = self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri)
+        if 'status' in status:
+            if status['status'] == 'error':
+                return True
+        return False
     
     # ListModels
     def pelion_list_models(self):
