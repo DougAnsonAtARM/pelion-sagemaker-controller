@@ -104,7 +104,8 @@ class ControllerAPI:
     # Is dispatched command running?
     def pelion_cmd_is_running(self,command):
         req_id = str(uuid.uuid4())
-        status = self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri)
+        status = json.loads(self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri))
+        print("Command Status: " + str(status))
         if command in status:
             if status[command] == 'running':
                 return True
@@ -113,7 +114,8 @@ class ControllerAPI:
     # Is dispatch command in error?
     def pelion_cmd_in_error(self,command):
         req_id = str(uuid.uuid4())
-        status = self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri)
+        status = json.loads(self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri))
+        print("Command Status: " + str(status))
         if command in status:
             if status[command] != 'error':
                 return True
