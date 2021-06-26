@@ -105,17 +105,20 @@ class ControllerAPI:
     def pelion_cmd_is_running(self,command):
         req_id = str(uuid.uuid4())
         status = self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri)
-        print("Command Status: " + str(status))
+        print("Command Dict: " + str(status) + " Status: " + status[command])
         if command in status:
+            print("command is in status")
             if status[command] == 'running':
+                print(" Status: " + status[command] + " is RUNNING")
                 return True
+        print(" Status: " + status[command] + " is RUNNING")
         return False
     
     # Is dispatch command in error?
     def pelion_cmd_in_error(self,command):
         req_id = str(uuid.uuid4())
         status = self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri)
-        print("Command Status: " + str(status))
+        print("Command Dict: " + str(status) + " Status: " + status[command])
         if command in status:
             if status[command] == 'error':
                 return True
@@ -141,8 +144,9 @@ class ControllerAPI:
     
     # ReloadModel
     def pelion_reload_model(self,model_name,s3_filename):
-        self.pelion_unload_model(model_name)
-        return self.pelion_load_model(model_name,s3_filename)
+        req_id = str(uuid.uuid4())
+        self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri, {"jsonrpc":"2.0","id":req_id,"method":"reloadModel","params":{"name":model_name,"s3_filename":s3_filename}})
+        return self.pelion_last_cmd_result()
 
     # Predict
     def pelion_predict(self,model_name,input_data_url,output_url):
