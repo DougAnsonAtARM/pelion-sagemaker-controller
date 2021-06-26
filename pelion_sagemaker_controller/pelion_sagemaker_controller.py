@@ -105,13 +105,12 @@ class ControllerAPI:
     def pelion_cmd_is_running(self,command):
         req_id = str(uuid.uuid4())
         status = self.__pelion_get(req_id,self.pelion_cmd_status_lwm2m_uri)
-        print("Command Dict: " + str(status) + " Status: " + status[command])
+        print("Raw Status: " + str(status))
         if command in status:
             print("command is in status")
             if status[command] == 'running':
                 print(" Status: " + status[command] + " is RUNNING")
                 return True
-        print(" Status: " + status[command] + " is RUNNING")
         return False
     
     # Is dispatch command in error?
