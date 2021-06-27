@@ -22,7 +22,7 @@ class ControllerAPI:
         # Pelion Edge Sagemaker Edge Agent Device surfaces out these two LWM2M resources
         self.pelion_rpc_request_lwmwm_uri = '/33311/0/5701'
         self.pelion_config_lwm2m_uri = '/33311/0/5702'
-        self.pelion_cmd_status_lwm2m_uri = '/33311/0/5702'
+        self.pelion_cmd_status_lwm2m_uri = '/33311/0/5703'
 
         # Standard Pelion Northbound API plumbing with our selected device ID from above...
         self.pelion_api_endpoint = api_endpoint
