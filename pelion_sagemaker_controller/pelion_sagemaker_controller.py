@@ -29,11 +29,12 @@ class ControllerAPI:
         self.pelion_request_headers = {'Authorization':'Bearer ' + self.pelion_api_key, 'content-type':'application/json' }
         self.pelion_long_poll_url = 'https://' + self.pelion_api_endpoint + '/v2/notification/pull'
         self.pelion_url = 'https://' + self.pelion_api_endpoint + '/v2/device-requests/' + self.pelion_sagemaker_agent_device_id + '?async-id='
+        self.pelion_ping_url = 'https://' + self.pelion_api_endpoint + '/v2/endpoints/' + gw_device_id 
 
     # Pelion DeviceRequests Dispatch (internal)
     def __pelion_device_request_dispatch(self,req_id, verb, uri, json_data):
         # We need to "wake up" Pelion so issue a "get"...
-        requests.get(self.pelion_rpc_request_lwmwm_uri, headers=self.pelion_request_headers)
+        requests.get(self.pelion_ping_url, headers=self.pelion_request_headers)
         
         # process the input payload
         pelion_b64_payload = ''
