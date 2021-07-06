@@ -32,6 +32,10 @@ class ControllerAPI:
 
     # Pelion DeviceRequests Dispatch (internal)
     def __pelion_device_request_dispatch(self,req_id, verb, uri, json_data):
+        # We need to "wake up" Pelion so issue a "get"...
+        requests.get(self.pelion_rpc_request_lwmwm_uri, headers=self.pelion_request_headers)
+        
+        # process the input payload
         pelion_b64_payload = ''
         if json_data != '':
             pelion_b64_payload = base64.b64encode(json.dumps(json_data).encode('utf-8')).decode('utf-8')
