@@ -34,7 +34,7 @@ class ControllerAPI:
     # Pelion DeviceRequests Dispatch (internal)
     def __pelion_device_request_dispatch(self,req_id, verb, uri, json_data):
         # We need to "wake up" Pelion so issue a "get"...
-        print('PelionSageAgent (PING): ' + self.pelion_ping_url)
+        # print('PelionSageAgent (PING): ' + self.pelion_ping_url)
         requests.get(self.pelion_ping_url, headers=self.pelion_request_headers)
         
         # process the input payload
