@@ -28,11 +28,11 @@ class ControllerAPI:
         self.pelion_api_endpoint = api_endpoint
         self.pelion_request_headers = {'Authorization':'Bearer ' + self.pelion_api_key, 'content-type':'application/json' }
         self.pelion_long_poll_url = 'https://' + self.pelion_api_endpoint + '/v2/notification/pull'
-        self.pelion_url = 'https://' + self.pelion_api_endpoint + '/v2/device-requests/' + self.pelion_pt_device_id + '?async-id='
+        self.pelion_device_requests_url = 'https://' + self.pelion_api_endpoint + '/v2/device-requests/' + self.pelion_pt_device_id + '?async-id='
         self.pelion_ping_url = 'https://' + self.pelion_api_endpoint + '/v2/endpoints/' + self.pelion_pt_device_id 
 
     # Pelion DeviceRequests Dispatch (internal)
-    def __pelion_device_request_dispatch(self,req_id, verb, uri, json_data):
+    def __pelion_device_request_dispatch(self, req_id, verb, uri, json_data):
         # We need to "wake up" Pelion so issue a "get"...
         # print('PelionSageAgent (PING): ' + self.pelion_ping_url)
         requests.get(self.pelion_ping_url, headers=self.pelion_request_headers)
@@ -48,8 +48,9 @@ class ControllerAPI:
             pelion_device_requests_cmd["payload-b64"] = pelion_b64_payload
 
         # Make the call to invoke the command...
-        pelion_cmd_response = requests.post(self.pelion_url + req_id, data=json.dumps(pelion_device_requests_cmd), headers=self.pelion_request_headers)
-        print('PelionSageAgent (' + verb + '): Url: ' + self.pelion_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
+        dispatch_url = self.pelion_device_requests_url + req_id
+        pelion_cmd_response = requests.post(dispatch_url, data=json.dumps(pelion_device_requests_cmd), headers=self.pelion_request_headers)
+        print('PelionSageAgent (' + verb + '): Url: ' + dispatch_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
 
         # Now Long Poll to get the command dispatch response..
         DoPoll = True
