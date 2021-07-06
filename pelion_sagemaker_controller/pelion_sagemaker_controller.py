@@ -12,12 +12,12 @@ import time
 #
 class ControllerAPI:
     # Constructor
-    def __init__(self, api_key, gw_device_id, api_endpoint = 'api.us-east-1.mbedcloud.com'):
+    def __init__(self, api_key, pt_device_id, api_endpoint='api.us-east-1.mbedcloud.com'):
         # To Do: Lets keep the API Key as protected as possible... 
         self.pelion_api_key = api_key
 
-        # We could make the Pelion Edge Sagemaker Edge Agent Device ID variable as well...
-        self.pelion_sagemaker_agent_device_id = gw_device_id
+        # We could make the Pelion Edge Sagemaker Edge Agent PT Device ID variable as well...
+        self.pelion_pt_device_id = pt_device_id
         
         # Pelion Edge Sagemaker Edge Agent Device surfaces out these two LWM2M resources
         self.pelion_rpc_request_lwmwm_uri = '/33311/0/5701'
@@ -28,12 +28,13 @@ class ControllerAPI:
         self.pelion_api_endpoint = api_endpoint
         self.pelion_request_headers = {'Authorization':'Bearer ' + self.pelion_api_key, 'content-type':'application/json' }
         self.pelion_long_poll_url = 'https://' + self.pelion_api_endpoint + '/v2/notification/pull'
-        self.pelion_url = 'https://' + self.pelion_api_endpoint + '/v2/device-requests/' + self.pelion_sagemaker_agent_device_id + '?async-id='
-        self.pelion_ping_url = 'https://' + self.pelion_api_endpoint + '/v2/endpoints/' + gw_device_id 
+        self.pelion_url = 'https://' + self.pelion_api_endpoint + '/v2/device-requests/' + self.pelion_pt_device_id + '?async-id='
+        self.pelion_ping_url = 'https://' + self.pelion_api_endpoint + '/v2/endpoints/' + self.pelion_pt_device_id 
 
     # Pelion DeviceRequests Dispatch (internal)
     def __pelion_device_request_dispatch(self,req_id, verb, uri, json_data):
         # We need to "wake up" Pelion so issue a "get"...
+        print('PelionSageAgent (PING): ' + self.pelion_ping_url)
         requests.get(self.pelion_ping_url, headers=self.pelion_request_headers)
         
         # process the input payload
@@ -48,7 +49,7 @@ class ControllerAPI:
 
         # Make the call to invoke the command...
         pelion_cmd_response = requests.post(self.pelion_url + req_id, data=json.dumps(pelion_device_requests_cmd), headers=self.pelion_request_headers)
-        print('DeviceRequest: ' + self.pelion_url + " Data: " + str(pelion_device_requests_cmd) + " Status Code: " + str(pelion_cmd_response.status_code))
+        print('PelionSageAgent (' + verb + '): Url: ' + self.pelion_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
 
         # Now Long Poll to get the command dispatch response..
         DoPoll = True
