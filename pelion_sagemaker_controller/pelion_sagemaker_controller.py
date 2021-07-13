@@ -405,6 +405,5 @@ class MyNotebook:
             output_tensor_reshaped = np.reshape(output_tensor,(json_tensor['shape'][0],json_tensor['shape'][1]))
 
             # Display the prediction result tensor details...
-            print("")
             print("Output Tensor (Reshaped) - Shape: " + json.dumps(output_tensor_reshaped.shape) + " Type: " + str(output_tensor_reshaped.dtype))
             return output_tensor_reshaped
