@@ -25,17 +25,20 @@ from IPython.display import display
 #
 class ControllerAPI:
     # Constructor
-    def __init__(self, api_key, pt_device_id, api_endpoint='api.us-east-1.mbedcloud.com'):
+    def __init__(self, api_key, pt_device_id, api_endpoint='api.us-east-1.mbedcloud.com',async_response_sec=1.0):
         # To Do: Lets keep the API Key as protected as possible... 
         self.pelion_api_key = api_key
 
         # We could make the Pelion Edge Sagemaker Edge Agent PT Device ID variable as well...
         self.pelion_pt_device_id = pt_device_id
         
-        # Pelion Edge Sagemaker Edge Agent Device surfaces out these two LWM2M resources
-        self.pelion_rpc_request_lwmwm_uri = '/33311/0/5701'
-        self.pelion_config_lwm2m_uri = '/33311/0/5702'
-        self.pelion_cmd_status_lwm2m_uri = '/33311/0/5703'
+        # Tunable to wait between long polling...in seconds
+        self.async_response_wait_time_sec = async_response_sec
+        
+        # Pelion Edge Sagemaker Edge Agent Device surfaces out these three LWM2M resources
+        self.pelion_rpc_request_lwmwm_uri = '/33311/0/5701'  # JsonRPC command resource
+        self.pelion_config_lwm2m_uri      = '/33311/0/5702'  # Config set/get resource
+        self.pelion_cmd_status_lwm2m_uri  = '/33311/0/5703'  # Long-running command completion status resource
 
         # Standard Pelion Northbound API plumbing with our selected device ID from above...
         self.pelion_api_endpoint = api_endpoint
@@ -63,7 +66,7 @@ class ControllerAPI:
         # Make the call to invoke the command...
         dispatch_url = self.pelion_device_requests_url + req_id
         pelion_cmd_response = requests.post(dispatch_url, data=json.dumps(pelion_device_requests_cmd), headers=self.pelion_request_headers)
-        print('PelionSageAgent (' + verb + '): Url: ' + dispatch_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
+        print('PelionSageAPI (' + verb + '): Url: ' + dispatch_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
 
         # Now Long Poll to get the command dispatch response..
         DoPoll = True
@@ -75,11 +78,14 @@ class ControllerAPI:
                 for response in responses_json['async-responses']:
                     if response['id'] == req_id:
                         pelion_command_response = ''
+                        if 'status' in response:
+                            pelion_command_response['status'] = response['status']
                         if 'payload' in response:
                             if response['payload'] != '':
                                 pelion_command_response = json.loads(base64.b64decode(response['payload']))
                         DoPoll = False
-            time.sleep(1)
+            if DoPoll == True:
+                time.sleep(self.async_response_wait_time_sec)
         return pelion_command_response
 
     # Pelion LWM2M Value Request (internal)
@@ -174,12 +180,12 @@ class ControllerAPI:
 # Pelion Sagemaker Notebook Helper Class    
 #
 class MyNotebook:
-    def __init__(self, api_key, device_id, endpoint_api, aws_s3_folder):
+    def __init__(self, api_key, device_id, endpoint_api, aws_s3_folder, async_response_sec=1.0):
         # Initialize Sagemaker
         self.sagemaker_init(aws_s3_folder)
         
         # Initialize Pelion Sagemaker Controller API
-        self.pelion_sagemaker_controller_init(api_key, device_id, endpoint_api)
+        self.pelion_sagemaker_controller_init(api_key, device_id, endpoint_api, async_response_sec)
     
     # Sagemaker Init()
     def sagemaker_init(self,aws_s3_folder):
@@ -212,12 +218,12 @@ class MyNotebook:
         print("IoT Input/Output Folder: " + 's3://{}/{}'.format(bucket, self.iot_folder))
         
     # Pelion Sagemaker Controller Init()
-    def pelion_sagemaker_controller_init(self, api_key, device_id, endpoint_api = 'api.us-east-1.mbedcloud.com'):
+    def pelion_sagemaker_controller_init(self, api_key, device_id, endpoint_api = 'api.us-east-1.mbedcloud.com', async_response_sec=1.0):
         print("")
         print("Initializing Pelion Sagemaker Controller. Pelion API: " + endpoint_api + " Pelion Sagemaker Edge Agent PT DeviceID: " + device_id)
         
         # Create an instance of the Controller API...
-        self.pelion_api = ControllerAPI(api_key,device_id,endpoint_api)
+        self.pelion_api = ControllerAPI(api_key,device_id,endpoint_api, async_response_sec)
         
         # Sync the configuration to match our sagemaker config
         print("")
