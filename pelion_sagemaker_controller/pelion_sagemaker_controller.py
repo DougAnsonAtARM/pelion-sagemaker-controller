@@ -25,7 +25,7 @@ from IPython.display import display
 #
 class ControllerAPI:
     # Constructor
-    def __init__(self, api_key, pt_device_id, api_endpoint='api.us-east-1.mbedcloud.com',async_response_sec=1.0):
+    def __init__(self, api_key, pt_device_id, api_endpoint='api.us-east-1.mbedcloud.com',async_response_sec=0.25):
         # To Do: Lets keep the API Key as protected as possible... 
         self.pelion_api_key = api_key
 
@@ -77,12 +77,14 @@ class ControllerAPI:
             if 'async-responses' in responses_json:
                 for response in responses_json['async-responses']:
                     if response['id'] == req_id:
-                        pelion_command_response = ''
+                        pelion_command_response = {}
                         if 'status' in response:
                             pelion_command_response['status'] = response['status']
                         if 'payload' in response:
                             if response['payload'] != '':
                                 pelion_command_response = json.loads(base64.b64decode(response['payload']))
+                                if 'status' in response:
+                                    pelion_command_response['status'] = response['status']
                         DoPoll = False
             if DoPoll == True:
                 time.sleep(self.async_response_wait_time_sec)
@@ -180,7 +182,7 @@ class ControllerAPI:
 # Pelion Sagemaker Notebook Helper Class    
 #
 class MyNotebook:
-    def __init__(self, api_key, device_id, endpoint_api, aws_s3_folder, async_response_sec=1.0):
+    def __init__(self, api_key, device_id, endpoint_api, aws_s3_folder, async_response_sec=0.25):
         # Initialize Sagemaker
         self.sagemaker_init(aws_s3_folder)
         
@@ -218,7 +220,7 @@ class MyNotebook:
         print("IoT Input/Output Folder: " + 's3://{}/{}'.format(bucket, self.iot_folder))
         
     # Pelion Sagemaker Controller Init()
-    def pelion_sagemaker_controller_init(self, api_key, device_id, endpoint_api = 'api.us-east-1.mbedcloud.com', async_response_sec=1.0):
+    def pelion_sagemaker_controller_init(self, api_key, device_id, endpoint_api = 'api.us-east-1.mbedcloud.com', async_response_sec=0.25):
         print("")
         print("Initializing Pelion Sagemaker Controller. Pelion API: " + endpoint_api + " Pelion Sagemaker Edge Agent PT DeviceID: " + device_id)
         
