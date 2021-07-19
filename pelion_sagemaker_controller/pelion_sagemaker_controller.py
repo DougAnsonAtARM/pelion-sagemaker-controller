@@ -89,10 +89,11 @@ class ControllerAPI:
                             DoPoll = False
                 if DoPoll == True:
                     time.sleep(self.async_response_wait_time_sec)
+            return pelion_command_response
         else:
             print('PelionSageAPI (' + verb + '): FAILED with status: ' + str(pelion_cmd_response.status_code))
-        return pelion_command_response
-
+            return pelion_cmd_response
+        
     # Pelion LWM2M Value Request (internal)
     def __pelion_get(self,req_id, uri):
         return self.__pelion_device_request_dispatch(req_id, 'GET', uri, '')
