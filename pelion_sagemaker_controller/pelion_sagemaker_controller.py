@@ -126,6 +126,7 @@ class ControllerAPI:
         config_update = {"jsonrpc":"2.0","id":req_id,"config":{}}
         config_update['config'][key] = value
         result = self.__pelion_put(req_id,self.pelion_config_lwm2m_uri,config_update)
+        print(result)
         if result.status_code >=  200 and result.status_code < 300:
             return self.pelion_get_config()
         else:
