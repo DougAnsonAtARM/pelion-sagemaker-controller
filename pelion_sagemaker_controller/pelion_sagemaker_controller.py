@@ -80,7 +80,7 @@ class ControllerAPI:
                         if response['id'] == req_id:
                             pelion_command_response = {}
                             if 'status' in response:
-                                pelion_command_response['status'] = response['status']
+                                pelion_command_response['status_code'] = response['status']
                             if 'payload' in response:
                                 if response['payload'] != '':
                                     pelion_command_response = json.loads(base64.b64decode(response['payload']))
