@@ -126,8 +126,7 @@ class ControllerAPI:
         config_update = {"jsonrpc":"2.0","id":req_id,"config":{}}
         config_update['config'][key] = value
         result = self.__pelion_put(req_id,self.pelion_config_lwm2m_uri,config_update)
-        print(result)
-        if result.status_code >=  200 and result.status_code < 300:
+        if result['status_code'] >= 200 and result['status_code'] < 300:
             return self.pelion_get_config()
         else:
             print("PelionSageAPI (PUT) set_config FAILED with status: " + str(result.status_code))
@@ -160,7 +159,7 @@ class ControllerAPI:
     def pelion_list_models(self):
         req_id = str(uuid.uuid4())
         result = self.__pelion_post(req_id, self.pelion_rpc_request_lwmwm_uri, {"jsonrpc":"2.0","id":req_id,"method":"listModels"})
-        if result.status_code >=  200 and result.status_code < 300:
+        if result['status_code'] >= 200 and result['status_code'] < 300:
             return self.pelion_last_cmd_result()
         else:
             return result
@@ -169,7 +168,7 @@ class ControllerAPI:
     def pelion_load_model(self,model_name,s3_filename):
         req_id = str(uuid.uuid4())
         result = self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri, {"jsonrpc":"2.0","id":req_id,"method":"loadModel","params":{"name":model_name,"s3_filename":s3_filename}})
-        if result.status_code >=  200 and result.status_code < 300:
+        if result['status_code'] >= 200 and result['status_code'] < 300:
             return self.pelion_last_cmd_result()
         else:
             return result
@@ -178,7 +177,7 @@ class ControllerAPI:
     def pelion_unload_model(self,model_name):
         req_id = str(uuid.uuid4())
         result = self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri, {"jsonrpc":"2.0","id":req_id,"method":"unloadModel","params":{"name":model_name}})
-        if result.status_code >=  200 and result.status_code < 300:
+        if result['status_code'] >= 200 and result['status_code'] < 300:
             return self.pelion_last_cmd_result()
         else:
             return result
@@ -187,7 +186,7 @@ class ControllerAPI:
     def pelion_reload_model(self,model_name,s3_filename):
         req_id = str(uuid.uuid4())
         result = self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri, {"jsonrpc":"2.0","id":req_id,"method":"reloadModel","params":{"name":model_name,"s3_filename":s3_filename}})
-        if result.status_code >=  200 and result.status_code < 300:
+        if result['status_code'] >= 200 and result['status_code'] < 300:
             return self.pelion_last_cmd_result()
         else:
             return result
@@ -196,7 +195,7 @@ class ControllerAPI:
     def pelion_predict(self,model_name,input_data_url,output_url):
         req_id = str(uuid.uuid4())
         result = self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri,{"jsonrpc":"2.0","id":req_id,"method":"predict","params":{"model_name":model_name,"input_data_url":input_data_url,"output_url":output_url}})
-        if result.status_code >=  200 and result.status_code < 300:
+        if result['status_code'] >= 200 and result['status_code'] < 300:
             return self.pelion_last_cmd_result()
         else:
             return result
@@ -255,13 +254,13 @@ class MyNotebook:
         print("")
         print("Syncing Pelion Configuration to match Sagemakers...")
         result = self.pelion_api.pelion_set_config('awsS3Bucket',self.bucket)
-        if result.status_code >=  200 and result.status_code < 300:
+        if result['status_code'] >= 200 and result['status_code'] < 300:
             result = self.pelion_api.pelion_set_config('awsS3ModelsDirectory',self.compilation_output_sub_folder)
-            if result.status_code >=  200 and result.status_code < 300:
+            if result['status_code'] >= 200 and result['status_code'] < 300:
                 result = self.pelion_api.pelion_set_config('awsS3DataDirectory',self.iot_folder)
-                if result.status_code >=  200 and result.status_code < 300:
+                if result['status_code'] >= 200 and result['status_code'] < 300:
                     result = self.pelion_api.pelion_set_config('awsRegion',self.region)
-        if result.status_code >=  200 and result.status_code < 300:
+        if result['status_code'] >= 200 and result['status_code'] < 300:
             print("")
             print("Configuration Sync SUCCESS. Current Pelion Configuration:")
             print(self.pelion_api.pelion_get_config())
