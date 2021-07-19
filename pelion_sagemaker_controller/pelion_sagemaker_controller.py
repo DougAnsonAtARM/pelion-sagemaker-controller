@@ -129,7 +129,7 @@ class ControllerAPI:
         if result.status_code >=  200 and result.status_code < 300:
             return self.pelion_get_config()
         else:
-            print("PelionSageAPI (PUT) set_config FAILED with status: " + result.status_code)
+            print("PelionSageAPI (PUT) set_config FAILED with status: " + str(result.status_code))
             return result
 
     #
