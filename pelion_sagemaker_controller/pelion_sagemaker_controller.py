@@ -85,7 +85,7 @@ class ControllerAPI:
                                 if response['payload'] != '':
                                     pelion_command_response = json.loads(base64.b64decode(response['payload']))
                                     if 'status' in response:
-                                        pelion_command_response['status'] = response['status']
+                                        pelion_command_response['status_code'] = response['status']
                             DoPoll = False
                 if DoPoll == True:
                     time.sleep(self.async_response_wait_time_sec)
