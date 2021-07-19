@@ -146,7 +146,7 @@ class ControllerAPI:
         if result['status_code'] >= 200 and result['status_code'] < 300:
             return self.pelion_get_config()
         else:
-            print("PelionSageAPI (PUT) set_config FAILED with status: " + str(result.status_code))
+            print("PelionSageAPI (PUT) set_config FAILED with status: " + str(result['status_code']))
             return result
 
     #
@@ -283,7 +283,7 @@ class MyNotebook:
             print(self.pelion_api.pelion_get_config())
         else:
             print("")
-            print("Configuration Sync FAILED with code: " + str(result.status_code))
+            print("Configuration Sync FAILED with code: " + str(result['status_code']))
             print("Please confirm Edge Agent PT DeviceID and Edge gateway availability and retry...")
             
     # Save off the model
