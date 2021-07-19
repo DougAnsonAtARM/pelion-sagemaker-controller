@@ -69,25 +69,28 @@ class ControllerAPI:
         print('PelionSageAPI (' + verb + '): Url: ' + dispatch_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
 
         # Now Long Poll to get the command dispatch response..
-        DoPoll = True
-        pelion_command_response = {}
-        while DoPoll:
-            long_poll_responses = requests.get(self.pelion_long_poll_url, headers=self.pelion_request_headers)
-            responses_json = json.loads(long_poll_responses.text)
-            if 'async-responses' in responses_json:
-                for response in responses_json['async-responses']:
-                    if response['id'] == req_id:
-                        pelion_command_response = {}
-                        if 'status' in response:
-                            pelion_command_response['status'] = response['status']
-                        if 'payload' in response:
-                            if response['payload'] != '':
-                                pelion_command_response = json.loads(base64.b64decode(response['payload']))
-                                if 'status' in response:
-                                    pelion_command_response['status'] = response['status']
-                        DoPoll = False
-            if DoPoll == True:
-                time.sleep(self.async_response_wait_time_sec)
+        if pelion_cmd_response.status_code >= 200 and pelion_cmd_response.status_code < 300:
+            DoPoll = True
+            pelion_command_response = {}
+            while DoPoll:
+                long_poll_responses = requests.get(self.pelion_long_poll_url, headers=self.pelion_request_headers)
+                responses_json = json.loads(long_poll_responses.text)
+                if 'async-responses' in responses_json:
+                    for response in responses_json['async-responses']:
+                        if response['id'] == req_id:
+                            pelion_command_response = {}
+                            if 'status' in response:
+                                pelion_command_response['status'] = response['status']
+                            if 'payload' in response:
+                                if response['payload'] != '':
+                                    pelion_command_response = json.loads(base64.b64decode(response['payload']))
+                                    if 'status' in response:
+                                        pelion_command_response['status'] = response['status']
+                            DoPoll = False
+                if DoPoll == True:
+                    time.sleep(self.async_response_wait_time_sec)
+        else:
+            print('PelionSageAPI (' + verb + '): FAILED with status: ' + str(pelion_cmd_response.status_code))
         return pelion_command_response
 
     # Pelion LWM2M Value Request (internal)
