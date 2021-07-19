@@ -85,6 +85,7 @@ class ControllerAPI:
                     for response in responses_json['async-responses']:
                         if response['id'] == req_id:
                             pelion_command_response = {}
+                            pelion_command_response['status_code'] = 200 #default is OK... we refine below...
                             if 'status' in response:
                                 pelion_command_response['status_code'] = response['status']
                             if 'payload' in response:
