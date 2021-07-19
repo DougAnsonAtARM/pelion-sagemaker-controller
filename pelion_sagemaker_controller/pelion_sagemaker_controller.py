@@ -35,6 +35,10 @@ class ControllerAPI:
         # Tunable to wait between long polling...in seconds
         self.async_response_wait_time_sec = async_response_sec
         
+        # Tunable to determine how long to wait for a result before declaring timeout
+        self.max_result_waittime = 20 # seconds
+        self.max_iteration_check = int(self.max_result_waittime / async_response_sec)
+        
         # Pelion Edge Sagemaker Edge Agent Device surfaces out these three LWM2M resources
         self.pelion_rpc_request_lwmwm_uri = '/33311/0/5701'  # JsonRPC command resource
         self.pelion_config_lwm2m_uri      = '/33311/0/5702'  # Config set/get resource
@@ -69,9 +73,11 @@ class ControllerAPI:
         print('PelionSageAPI (' + verb + '): Url: ' + dispatch_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
 
         # Now Long Poll to get the command dispatch response..
+        iteration_check = 1
+        pelion_command_response = {}
         if pelion_cmd_response.status_code >= 200 and pelion_cmd_response.status_code < 300:
+            # Command succeeded - look for the result...
             DoPoll = True
-            pelion_command_response = {}
             while DoPoll:
                 long_poll_responses = requests.get(self.pelion_long_poll_url, headers=self.pelion_request_headers)
                 responses_json = json.loads(long_poll_responses.text)
@@ -89,10 +95,20 @@ class ControllerAPI:
                             DoPoll = False
                 if DoPoll == True:
                     time.sleep(self.async_response_wait_time_sec)
-            return pelion_command_response
+                    iteration_check = iteration_check + 1
+                    if iteration_check > self.max_iteration_check:
+                        print('PelionSageAPI (' + verb + '): Timeout reached looking for result')
+                        pelion_command_response['status_code'] = 408
+                        pelion_command_response['url'] = dispatch_url
+                        pelion_command_response['verb'] = verb
+                        DoPoll = False
         else:
+            # Command failed - report the status...
             print('PelionSageAPI (' + verb + '): FAILED with status: ' + str(pelion_cmd_response.status_code))
-            return pelion_cmd_response
+            pelion_command_response['status_code'] = pelion_cmd_response.status_code
+            pelion_command_response['url'] = dispatch_url
+            pelion_command_response['verb'] = verb
+        return pelion_command_response
         
     # Pelion LWM2M Value Request (internal)
     def __pelion_get(self,req_id, uri):
