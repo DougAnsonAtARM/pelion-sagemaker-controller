@@ -36,8 +36,11 @@ class ControllerAPI:
         self.async_response_wait_time_sec = async_response_sec
         
         # Tunable to determine how long to wait for a result before declaring timeout
-        self.max_result_waittime = 20 # seconds
+        self.max_result_waittime = 10 # seconds
         self.max_iteration_check = int(self.max_result_waittime / async_response_sec)
+        
+        # How many times to try POST to Pelion
+        self.max_num_post_tries = 2 # 2 tries...
         
         # Pelion Edge Sagemaker Edge Agent Device surfaces out these three LWM2M resources
         self.pelion_rpc_request_lwmwm_uri = '/33311/0/5701'  # JsonRPC command resource
@@ -69,47 +72,63 @@ class ControllerAPI:
 
         # Make the call to invoke the command...
         dispatch_url = self.pelion_device_requests_url + req_id
-        pelion_cmd_response = requests.post(dispatch_url, data=json.dumps(pelion_device_requests_cmd), headers=self.pelion_request_headers)
-        print('PelionSageAPI (' + verb + '): Url: ' + dispatch_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
+        
+        # Try this a few times if needed
+        for post_try in range(0, self.max_num_post_tries):
+            pelion_cmd_response = requests.post(dispatch_url, data=json.dumps(pelion_device_requests_cmd), headers=self.pelion_request_headers)
+            print('PelionSageAPI (' + verb + ')[' + str(post_try) + ']: Url: ' + dispatch_url + " Data: " + str(pelion_device_requests_cmd) + " Status: " + str(pelion_cmd_response.status_code))
 
-        # Now Long Poll to get the command dispatch response..
-        iteration_check = 1
-        pelion_command_response = {}
-        if pelion_cmd_response.status_code >= 200 and pelion_cmd_response.status_code < 300:
-            # Command succeeded - look for the result...
+            # Now Long Poll to get the command dispatch response..
+            iteration_check = 1
+            pelion_command_response = {}
+            iteration_status = 0
             DoPoll = True
-            while DoPoll:
-                long_poll_responses = requests.get(self.pelion_long_poll_url, headers=self.pelion_request_headers)
-                responses_json = json.loads(long_poll_responses.text)
-                if 'async-responses' in responses_json:
-                    for response in responses_json['async-responses']:
-                        if response['id'] == req_id:
-                            pelion_command_response = {}
-                            pelion_command_response['status_code'] = 200 #default is OK... we refine below...
-                            if 'status' in response:
-                                pelion_command_response['status_code'] = response['status']
-                            if 'payload' in response:
-                                if response['payload'] != '':
-                                    pelion_command_response = json.loads(base64.b64decode(response['payload']))
-                                    if 'status' in response:
-                                        pelion_command_response['status_code'] = response['status']
+            if pelion_cmd_response.status_code >= 200 and pelion_cmd_response.status_code < 300:
+                # Command succeeded - look for the result...
+                while DoPoll:
+                    long_poll_responses = requests.get(self.pelion_long_poll_url, headers=self.pelion_request_headers)
+                    responses_json = json.loads(long_poll_responses.text)
+                    if 'async-responses' in responses_json:
+                        for response in responses_json['async-responses']:
+                            if response['id'] == req_id:
+                                pelion_command_response = {}
+                                pelion_command_response['status_code'] = 200 #default is OK... we refine below...
+                                if 'status' in response:
+                                    pelion_command_response['status_code'] = response['status']
+                                if 'payload' in response:
+                                    if response['payload'] != '':
+                                        pelion_command_response = json.loads(base64.b64decode(response['payload']))
+                                        if 'status' in response:
+                                            pelion_command_response['status_code'] = response['status']
+                                DoPoll = False
+                                iteration_status = 1
+                    if DoPoll == True:
+                        time.sleep(self.async_response_wait_time_sec)
+                        iteration_check = iteration_check + 1
+                        if iteration_check > self.max_iteration_check:
+                            print('PelionSageAPI (' + verb + '): Timeout reached looking for result')
+                            pelion_command_response['status_code'] = 408
+                            pelion_command_response['url'] = dispatch_url
+                            pelion_command_response['verb'] = verb
                             DoPoll = False
-                if DoPoll == True:
-                    time.sleep(self.async_response_wait_time_sec)
-                    iteration_check = iteration_check + 1
-                    if iteration_check > self.max_iteration_check:
-                        print('PelionSageAPI (' + verb + '): Timeout reached looking for result')
-                        pelion_command_response['status_code'] = 408
-                        pelion_command_response['url'] = dispatch_url
-                        pelion_command_response['verb'] = verb
-                        DoPoll = False
-        else:
-            # Command failed - report the status...
-            print('PelionSageAPI (' + verb + '): FAILED with status: ' + str(pelion_cmd_response.status_code))
-            pelion_command_response['status_code'] = pelion_cmd_response.status_code
-            pelion_command_response['url'] = dispatch_url
-            pelion_command_response['verb'] = verb
-        return pelion_command_response
+                            iteration_status = 3
+            else:
+                # Command failed - report the status...
+                print('PelionSageAPI (' + verb + '): FAILED with status: ' + str(pelion_cmd_response.status_code))
+                pelion_command_response['status_code'] = pelion_cmd_response.status_code
+                pelion_command_response['url'] = dispatch_url
+                pelion_command_response['verb'] = verb
+                iteration_status = 2
+                
+            if iteration_status == 1:
+                # Success - so just return
+                return pelion_command_response
+            if iteration_status == 3 and post_try >= (self.max_num_post_tries-1):
+                # Timeout and max number of post tries about to be exceeded
+                return pelion_command_response
+            if iteration_status == 2:
+                # Error from Pelion - so just return with the error
+                return pelion_command_response
         
     # Pelion LWM2M Value Request (internal)
     def __pelion_get(self,req_id, uri):
