@@ -36,7 +36,7 @@ class ControllerAPI:
         self.async_response_wait_time_sec = async_response_sec
         
         # Tunable to determine how long to wait for a result before declaring timeout
-        self.max_result_waittime = 10 # seconds
+        self.max_result_waittime = 120 # seconds
         self.max_iteration_check = int(self.max_result_waittime / async_response_sec)
         
         # How many times to try POST to Pelion
@@ -414,11 +414,14 @@ class MyNotebook:
         for i, img in enumerate(my_list):
             display(img)
             if most_likely_labels != None:
-                pred = most_likely_labels[i]
-                pred_tuple = pred[0]
-                pred_name = pred_tuple[1]
-                pred_percent = round(pred_tuple[2]*100.0,3)
-                print("Predicted Image Contents: \"" + pred_name + "\" Confidence: " + str(pred_percent) +"%")
+                if i < len(most_likely_labels):
+                    pred = most_likely_labels[i]
+                    pred_tuple = pred[0]
+                    pred_name = pred_tuple[1]
+                    pred_percent = round(pred_tuple[2]*100.0,3)
+                    print("Predicted Image Contents: \"" + pred_name + "\" Confidence: " + str(pred_percent) +"%")
+                else:
+                    print("Predicted Image Contents not calculated: models compiled-in input shape length set too small for current dataset")
             print("")
 
     # Read in a batch of images
