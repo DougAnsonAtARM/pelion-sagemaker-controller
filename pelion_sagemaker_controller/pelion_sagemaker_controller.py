@@ -36,7 +36,7 @@ class ControllerAPI:
         self.async_response_wait_time_sec = async_response_sec
         
         # Tunable to determine how long to wait for a result before declaring timeout
-        self.max_result_waittime = 120 # seconds
+        self.max_result_waittime = 20 # seconds
         self.max_iteration_check = int(self.max_result_waittime / async_response_sec)
         
         # How many times to try POST to Pelion
