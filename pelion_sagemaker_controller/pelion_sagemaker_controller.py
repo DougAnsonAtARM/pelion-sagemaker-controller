@@ -152,9 +152,13 @@ class ControllerAPI:
     #
     
     # Get Configuration
-    def pelion_get_config(self):
+    def pelion_get_config(self, key=None):
         req_id = str(uuid.uuid4())
-        return self.__pelion_get(req_id,self.pelion_config_lwm2m_uri)
+        my_config = self.__pelion_get(req_id,self.pelion_config_lwm2m_uri)
+        if key == None:
+            return my_config
+        else:
+            return my_config['config'][key]
 
     # Set Configuration
     def pelion_set_config(self,key,value):
