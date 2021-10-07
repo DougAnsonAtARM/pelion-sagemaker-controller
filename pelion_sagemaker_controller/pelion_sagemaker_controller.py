@@ -222,6 +222,15 @@ class ControllerAPI:
         else:
             return result
     
+    # DescribeModel
+    def pelion_describe_model(self,model_name):
+        req_id = str(uuid.uuid4())
+        result = self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri, {"jsonrpc":"2.0","id":req_id,"method":"describeModel","params":{"name":model_name}})
+        if result['status_code'] >= 200 and result['status_code'] < 300:
+            return self.pelion_last_cmd_result()
+        else:
+            return result
+        
     # ReloadModel
     def pelion_reload_model(self,model_name,s3_filename):
         req_id = str(uuid.uuid4())
@@ -231,15 +240,23 @@ class ControllerAPI:
         else:
             return result
 
-    # Predict
-    def pelion_predict(self,model_name,input_data_url,output_url):
+    # PredictAndCapture with optional AuxData
+    def pelion_predict(self,model_name,input_data_url,output_url,capture_enable=False,aux_data=[]):
         req_id = str(uuid.uuid4())
-        result = self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri,{"jsonrpc":"2.0","id":req_id,"method":"predict","params":{"model_name":model_name,"input_data_url":input_data_url,"output_url":output_url}})
+        result = self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri,{"jsonrpc":"2.0","id":req_id,"method":"predict","params":{"model_name":model_name,"input_data_url":input_data_url,"output_url":output_url,"capture_enable":capture_enable,"aux_data":aux_data}})
         if result['status_code'] >= 200 and result['status_code'] < 300:
             return self.pelion_last_cmd_result()
         else:
             return result
-    
+        
+    # GetDataCaptureStatus
+    def pelion_get_data_capture_status(self,capture_id):
+        req_id = str(uuid.uuid4())
+        result = self.__pelion_post(req_id,self.pelion_rpc_request_lwmwm_uri, {"jsonrpc":"2.0","id":req_id,"method":"getDataCaptureStatus","params":{"capture_id":capture_id}})
+        if result['status_code'] >= 200 and result['status_code'] < 300:
+            return self.pelion_last_cmd_result()
+        else:
+            return result
     
 #
 # Pelion Sagemaker Notebook Helper Class    
