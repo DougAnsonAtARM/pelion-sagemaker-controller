@@ -691,6 +691,22 @@ class MyNotebook:
                 self.s3.Object(bucket_obj.name, obj.key).delete()
         else:
             print("Not clearing captures in S3 for Timestamp: " + str(timestamp) + "...")
+    
+    # Finalize any cleanup of captures
+    def finalize_clean_captures(self, clearS3=True, clearNB=False):
+        if clearNB is True:
+            local_dir = self.vp_capture_folder
+            try:
+                shutil.rmtree(local_dir, ignore_errors=True)
+            except OSError as e:
+                print("Exception during NP rmtree(): " + e.strerror)
+        
+        # Clear out the S3 captures
+        if clearS3 is True:
+            s3_capture_dir = self.folder + "/" + self.vp_capture_folder + "/"
+            bucket_obj = self.s3.Bucket(self.bucket)
+            for obj in bucket_obj.objects.filter(Prefix=s3_capture_dir):
+                self.s3.Object(bucket_obj.name, obj.key).delete()
         
     # Copy our prediction results back to our notebook from S3...
     def copy_results_to_notebook(self, output_tensor_url, local_output_tensor_filename):
