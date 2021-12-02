@@ -517,7 +517,7 @@ class MyNotebook:
     def vp_set_captures_per_iteration(self, captures):
         if captures > 0:
             self.vp_captures_per_iteration = captures
-            self.pelion_api.pelion_set_vp_config('captureFPS',str(captures))
+            self.pelion_api.pelion_set_vp_config('numCapturesPerPrediction',str(captures))
                 
     # Pull the timestamps from the bucket content listing                
     def __get_timestamp_list(self, bucket_listing):
