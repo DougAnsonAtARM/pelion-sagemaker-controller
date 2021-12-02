@@ -513,6 +513,12 @@ class MyNotebook:
         print('Done!')
         return self.model_package
     
+    # Set the capture directory
+    def vp_set_capture_directory(self, capture_dir):
+        if not capture_dir is None:
+            self.vp_capture_folder = capture_dir
+            self.pelion_api.pelion_set_vp_config("notebookCaptureRoot",capture_dir)
+            
     # Set the number of captures per iteration
     def vp_set_captures_per_iteration(self, captures):
         if captures > 0:
